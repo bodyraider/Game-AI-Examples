@@ -13,6 +13,8 @@ enum location_type
 
 
 
+//uncomment this to send the output to a text file
+//#define TEXTOUTPUT
 
 
 
