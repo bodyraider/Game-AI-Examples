@@ -7,20 +7,27 @@ public class Behaviors : MonoBehaviour {
     public double MaxSpeed = 5;
     public float PushForce = 50;
     public float TurnForce = 100;
+    public Vector3 direction;
     private Rigidbody rb;
-    public List<GameObject> neighbor = new List<GameObject>();
     public Vector3 offset = new Vector3(1, 0, 0);
     GameObject wanderpoint;
 	void Start () {
         rb = GetComponent<Rigidbody>();
-        wanderpoint = GameObject.FindGameObjectWithTag("WanderPoint");       
-	}
+        wanderpoint = GameObject.FindGameObjectWithTag("WanderPoint");
+    }
 	
 	// Update is called once per frame
 	void Update () {
+        direction = rb.velocity.normalized;
+        Vector3 separate = GetComponentInChildren<TagNeighbor>().Separation();
+        Vector3 alignment = GetComponentInChildren<TagNeighbor>().Alignment();
         wanderpoint.transform.position = transform.position + offset;
         wanderpoint.transform.rotation = Quaternion.Euler(0, 0, 0);
-        rb.AddForce(Jitter(wanderpoint.transform.position) - transform.position);
+        if (tag == "Player")
+            rb.AddForce(separate);
+        else
+        rb.AddForce(alignment);
+        //rb.AddForce(Jitter(wanderpoint.transform.position) - transform.position);
         ResetPosition();
         
 	}
@@ -70,19 +77,5 @@ public class Behaviors : MonoBehaviour {
         if (transform.position.z < -40)
             transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + 80);
     }
-    private void OnTriggerEnter(Collider other)
-    {
-        //if (other.tag == "Enemy")
-        //{
-            neighbor.Add(other.gameObject);
-        //Debug.Log("1");
-        //}
-    }
-    //private void OnTriggerExit(Collider other)
-    //{
-    //    //if (other.tag == "Enemy")
-    //    {
-    //        neighbor.Remove(other.gameObject);
-    //    }
-    //}
+    
 }
