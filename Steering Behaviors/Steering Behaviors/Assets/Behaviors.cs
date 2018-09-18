@@ -5,12 +5,15 @@ using UnityEngine;
 public class Behaviors : MonoBehaviour {
     public double arrivetime = 1;     //到达时间的快慢
     public double MaxSpeed = 5;
+    public float PushForce = 50;
+    public float TurnForce = 100;
     private Rigidbody rb;
+    public List<GameObject> neighbor = new List<GameObject>();
     public Vector3 offset = new Vector3(1, 0, 0);
     GameObject wanderpoint;
 	void Start () {
         rb = GetComponent<Rigidbody>();
-        wanderpoint = GameObject.FindGameObjectWithTag("WanderPoint");
+        wanderpoint = GameObject.FindGameObjectWithTag("WanderPoint");       
 	}
 	
 	// Update is called once per frame
@@ -19,7 +22,7 @@ public class Behaviors : MonoBehaviour {
         wanderpoint.transform.rotation = Quaternion.Euler(0, 0, 0);
         rb.AddForce(Jitter(wanderpoint.transform.position) - transform.position);
         ResetPosition();
-        Debug.Log(Jitter(wanderpoint.transform.position) - transform.position);
+        
 	}
 
     Vector3 Seek(Vector3 TargetPos)   //返回一个向量，最终通过AddForce发力
@@ -51,13 +54,35 @@ public class Behaviors : MonoBehaviour {
     Vector3 Jitter(Vector3 wanderpoint)   //为Wander制造一个随机抖动
     {
         Vector3 jitter = Random.onUnitSphere;
+        jitter.x *= PushForce;
         jitter.y = 0;
-        jitter.z *= 30;
+        jitter.z *= TurnForce;
         return (wanderpoint + jitter);
     }
     void ResetPosition()
     {
-        if (transform.position.x > 19.7)
-            transform.position = Vector3.Scale(transform.position, new Vector3(-1, 0, 0));
+        if (transform.position.x > 40)
+            transform.position = new Vector3(transform.position.x - 80, transform.position.y, transform.position.z);
+        if (transform.position.x < -40)
+            transform.position = new Vector3(transform.position.x + 80, transform.position.y, transform.position.z);
+        if (transform.position.z > 40)
+            transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z - 80);
+        if (transform.position.z < -40)
+            transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + 80);
     }
+    private void OnTriggerEnter(Collider other)
+    {
+        //if (other.tag == "Enemy")
+        //{
+            neighbor.Add(other.gameObject);
+        //Debug.Log("1");
+        //}
+    }
+    //private void OnTriggerExit(Collider other)
+    //{
+    //    //if (other.tag == "Enemy")
+    //    {
+    //        neighbor.Remove(other.gameObject);
+    //    }
+    //}
 }
