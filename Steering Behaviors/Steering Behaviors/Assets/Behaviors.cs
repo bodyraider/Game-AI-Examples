@@ -21,13 +21,15 @@ public class Behaviors : MonoBehaviour {
         direction = rb.velocity.normalized;
         Vector3 separate = GetComponentInChildren<TagNeighbor>().Separation();
         Vector3 alignment = GetComponentInChildren<TagNeighbor>().Alignment();
-        wanderpoint.transform.position = transform.position + offset;
-        wanderpoint.transform.rotation = Quaternion.Euler(0, 0, 0);
-        if (tag == "Player")
-            rb.AddForce(separate);
-        else
-        rb.AddForce(alignment);
+        Vector3 cohesion = GetComponentInChildren<TagNeighbor>().Cohesion();
+        Vector3 wander = Wander();
+        //wanderpoint.transform.position = transform.position + offset;
+        //wanderpoint.transform.rotation = Quaternion.Euler(0, 0, 0);
+        //rb.AddForce(separate);
+        //rb.AddForce(alignment);
         //rb.AddForce(Jitter(wanderpoint.transform.position) - transform.position);
+        rb.AddForce(wander);
+        Debug.Log(wander.magnitude);
         ResetPosition();
         
 	}
@@ -65,6 +67,15 @@ public class Behaviors : MonoBehaviour {
         jitter.y = 0;
         jitter.z *= TurnForce;
         return (wanderpoint + jitter);
+    }
+
+    Vector3 Wander()
+    {
+        Vector3 jitter = Random.onUnitSphere;
+        jitter.x *= PushForce;
+        jitter.y = 0;
+        jitter.z *= TurnForce;
+        return jitter;
     }
     void ResetPosition()
     {

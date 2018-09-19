@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class TagNeighbor : MonoBehaviour {
     public List<GameObject> neighbor = new List<GameObject>();
-    public float SeparateForce = 1;
+    public float SeparateForce = 200;
+    public float AlignmentForce = 500;
+    public float CohesionForce = 30;
     // Use this for initialization
     void Start () {
 		
@@ -50,7 +52,24 @@ public class TagNeighbor : MonoBehaviour {
             }
             SteeringForce /= neighbor.Count;
             Vector3 SelfHeading = GetComponentInParent<Behaviors>().direction;
-            return Vector3.Scale((SteeringForce - SelfHeading),new Vector3(100,1,100));
+            return (SteeringForce - SelfHeading) * AlignmentForce;
+        }
+        return SteeringForce;
+    }
+    public Vector3 Cohesion()
+    {
+        Vector3 SteeringForce = new Vector3(0, 0, 0);
+        Vector3 CenterOfMass = new Vector3(0, 0, 0);
+        if (neighbor.Count > 0)
+        {
+            for (int index = 0; index < neighbor.Count; index++)
+            {
+                CenterOfMass += neighbor[index].transform.position;
+                
+            }
+            CenterOfMass /= neighbor.Count;
+            SteeringForce = (CenterOfMass - transform.position) * CohesionForce;
+            return SteeringForce;
         }
         return SteeringForce;
     }
