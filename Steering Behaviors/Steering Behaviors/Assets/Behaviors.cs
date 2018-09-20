@@ -5,31 +5,27 @@ using UnityEngine;
 public class Behaviors : MonoBehaviour {
     public double arrivetime = 1;     //到达时间的快慢
     public double MaxSpeed = 5;
-    public float PushForce = 50;
-    public float TurnForce = 100;
+    public float XForce = 50;
+    public float ZForce = 100;
     public Vector3 direction;
     private Rigidbody rb;
-    public Vector3 offset = new Vector3(1, 0, 0);
-    GameObject wanderpoint;
 	void Start () {
         rb = GetComponent<Rigidbody>();
-        wanderpoint = GameObject.FindGameObjectWithTag("WanderPoint");
     }
 	
 	// Update is called once per frame
 	void Update () {
         direction = rb.velocity.normalized;
         Vector3 separate = GetComponentInChildren<TagNeighbor>().Separation();
+        Vector3 bossseparate = GetComponentInChildren<TagNeighbor>().BossSeparation();
         Vector3 alignment = GetComponentInChildren<TagNeighbor>().Alignment();
         Vector3 cohesion = GetComponentInChildren<TagNeighbor>().Cohesion();
         Vector3 wander = Wander();
-        //wanderpoint.transform.position = transform.position + offset;
-        //wanderpoint.transform.rotation = Quaternion.Euler(0, 0, 0);
-        //rb.AddForce(separate);
-        //rb.AddForce(alignment);
-        //rb.AddForce(Jitter(wanderpoint.transform.position) - transform.position);
+        rb.AddForce(alignment);
         rb.AddForce(wander);
-        Debug.Log(wander.magnitude);
+        rb.AddForce(cohesion);
+        rb.AddForce(separate);
+        rb.AddForce(bossseparate);
         ResetPosition();
         
 	}
@@ -63,18 +59,18 @@ public class Behaviors : MonoBehaviour {
     Vector3 Jitter(Vector3 wanderpoint)   //为Wander制造一个随机抖动
     {
         Vector3 jitter = Random.onUnitSphere;
-        jitter.x *= PushForce;
+        jitter.x *= XForce;
         jitter.y = 0;
-        jitter.z *= TurnForce;
+        jitter.z *= ZForce;
         return (wanderpoint + jitter);
     }
 
     Vector3 Wander()
     {
         Vector3 jitter = Random.onUnitSphere;
-        jitter.x *= PushForce;
+        jitter.x *= XForce;
         jitter.y = 0;
-        jitter.z *= TurnForce;
+        jitter.z *= ZForce;
         return jitter;
     }
     void ResetPosition()

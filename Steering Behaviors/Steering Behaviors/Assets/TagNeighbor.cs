@@ -7,24 +7,33 @@ public class TagNeighbor : MonoBehaviour {
     public float SeparateForce = 200;
     public float AlignmentForce = 500;
     public float CohesionForce = 30;
+    public float BossFleeForce = 50;
+    bool BossInRange = false;
+    public Vector3 BossPosition;
+    GameObject Boss;
     // Use this for initialization
     void Start () {
-		
+        
 	}
 	
 	// Update is called once per frame
 	void Update () {
-
+        //GameObject Boss = GameObject.FindGameObjectWithTag("Boss");
+        
     }
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag == "TagNeighbor")   
-            neighbor.Add(other.gameObject);            
+            neighbor.Add(other.gameObject);
+        if (other.tag == "Boss")
+            BossInRange = true;
     }
     private void OnTriggerExit(Collider other)
     {
         if (other.tag == "TagNeighbor")
-            neighbor.Remove(other.gameObject);       
+            neighbor.Remove(other.gameObject);
+        if (other.tag == "Boss")
+            BossInRange = false;
     }
 
     public Vector3 Separation()
@@ -39,6 +48,21 @@ public class TagNeighbor : MonoBehaviour {
             }
         }
         return SteeringForce;
+    }
+
+    public Vector3 BossSeparation()
+    {
+        GameObject Boss = GameObject.FindGameObjectWithTag("Boss");
+        Vector3 SteeringForce = new Vector3(0, 0, 0);
+        if (BossInRange)
+        {
+            BossPosition = Boss.transform.position;
+            SteeringForce = transform.position - BossPosition;
+            SteeringForce *= BossFleeForce;
+            return SteeringForce;
+        }
+        return SteeringForce;
+
     }
     public Vector3 Alignment()
     {
